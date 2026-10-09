@@ -18,9 +18,12 @@ public class MovingBlock : MonoBehaviour
     {
         startPos = transform.position;                                 //初期位置
         endPos = new Vector2(startPos.x + moveX, startPos.y + moveY);  //移動位置
-
         //テキストをみて完成させましょう
-
+        if (isMoveWhenOn)
+        {
+            //乗ったときに動くので最初は動かさない
+            isCanMove = false;
+        }
     }
 
     // Update is called once per frame
@@ -29,7 +32,29 @@ public class MovingBlock : MonoBehaviour
         if (isCanMove)
         {
             //テキストをみて完成させましょう
-
+            float distance = Vector2.Distance(startPos, endPos); //移動距離
+            float ds = distance / times; //1秒の移動距離
+            float df = ds * Time.deltaTime; //1フレームの移動距離
+            movep += df / distance; //移動補完値
+            if (isReverse)
+            {
+                transform.position = Vector2.Lerp(endPos, startPos, movep); //逆移動
+            }
+            else
+            {
+                transform.position = Vector2.Lerp(startPos, endPos, movep); //正移動
+            }
+            if (movep >= 1.0f)
+            {
+                movep = 0.0f; //移動補完値リセット
+                isReverse = !isReverse; //移動を逆転
+                isCanMove = false; //移動停止
+                if (isMoveWhenOn == false)
+                {
+                    //乗ったときに動くフラグOFF
+                    Invoke("Move", wait); //移動フラグを立てる遅延実行
+                }
+            }
         }
     }
 
@@ -37,28 +62,41 @@ public class MovingBlock : MonoBehaviour
     public void Move()
     {
         //テキストをみて完成させましょう
-
+        isCanMove = true;
     }
 
     //移動フラグを下ろす
     public void Stop()
     {
         //テキストをみて完成させましょう
-
+        isCanMove = false;
     }
 
     //接触開始
     void OnCollisionEnter2D(Collision2D collision)
     {
         //テキストをみて完成させましょう
-
+        if (collision.gameObject.tag == "Player")
+        {
+            //接触したのがプレイヤーなら移動床の子にする
+            collision.transform.SetParent(transform);
+            if (isMoveWhenOn)
+            {
+                //乗ったときに動くフラグON
+                isCanMove = true; //移動フラグを立てる
+            }
+        }
     }
 
     //接触終了
     void OnCollisionExit2D(Collision2D collision)
     {
         //テキストをみて完成させましょう
-
+        if (collision.gameObject.tag == "Player")
+        {
+            //接触したのがプレイヤーなら移動床の子から外す
+            collision.transform.SetParent(null);
+        }
     }
 
     //移動範囲表示

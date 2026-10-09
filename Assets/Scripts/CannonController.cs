@@ -1,3 +1,4 @@
+using Unity.Mathematics;
 using UnityEngine;
 
 public class CannonController : MonoBehaviour
@@ -32,6 +33,17 @@ public class CannonController : MonoBehaviour
             if (passedTimes > delayTime)
             {
                 //テキストをみて完成させましょう
+                passedTimes = 0; //時間を0にリセット
+                //砲弾をプレハブから作る
+                Vector2 pos =new Vector2(gateTransform.position.x, gateTransform.position.y);
+                GameObject obj= Instantiate(objPrefab,pos,Quaternion.identity);
+                //砲身が向いている方向に発車する
+                Rigidbody2D rbody =obj.GetComponent<Rigidbody2D>();
+                float angleZ = transform.localEulerAngles.z;
+                float x = Mathf.Cos(angleZ * Mathf.Deg2Rad);
+                float y = Mathf.Sin(angleZ * Mathf.Deg2Rad);
+                Vector2 v = new Vector2(x, y) * fireSpeed;
+                rbody.AddForce(v, ForceMode2D.Impulse);
             }
         }
     }
