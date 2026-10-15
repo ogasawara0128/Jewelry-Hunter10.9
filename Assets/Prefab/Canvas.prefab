@@ -1023,6 +1023,8 @@ MonoBehaviour:
   timeText: {fileID: 3191051452884341735}
   scoreText: {fileID: 86153766397707384}
   stageScore: 0
+  meGameClear: {fileID: 8300000, guid: 32a3684314927490ab86fd2793d70ba3, type: 3}
+  meGameOver: {fileID: 8300000, guid: d344f3c0bb8f94974a5a76b4a40ebdae, type: 3}
 --- !u!114 &6767473778611026309
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1048,7 +1050,7 @@ AudioSource:
   m_GameObject: {fileID: 4576821744734304228}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -741424510858926700, guid: d51b3e9e024a0ab4995b7ee8148ba8c3, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: db1405096d45c48479cc3834979acf93, type: 3}
   m_PlayOnAwake: 1

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem; //InputSystemを使うのに必要
 
 public enum GameState           // ゲームの状態
 {
@@ -49,6 +50,20 @@ public class PlayerController : MonoBehaviour
 
     public int score = 0; //スコア
 
+    InputAction moveAction; //Moveアクション
+    InputAction jumpAction; //Jumpアクション
+
+    //UIマップに切り替わったときに有効
+    void OnSubmit(InputValue value)
+    {
+        if(gameState!=GameState.InGame)
+        {
+            //GameManagerスクリプトを探してくる
+            GameManager gm = GameObject.FindFirstObjectByType<GameManager>();
+            gm.GameEnd(); //ステータスに応じてNext()かRestart()が発動
+        }
+    }
+
     void Start()
     {
         rbody = this.GetComponent<Rigidbody2D>();   // Rigidbody2Dを取ってくる
@@ -57,7 +72,30 @@ public class PlayerController : MonoBehaviour
         oldAnime = stopAnime; //停止から開始する
 
         gameState = GameState.InGame; //ゲーム中にする
+
+        PlayerInput input = GetComponent<PlayerInput>(); //PlayerInput取得
+        moveAction = input.currentActionMap.FindAction("Move"); //Moveアクション取得
+        jumpAction = input.currentActionMap.FindAction("Jump"); //Jumpアクション取得
+        InputActionMap uiMap = input.actions.FindActionMap("UI"); //UIマップ取得
+        uiMap.Disable(); //UIマップ無効化
     }
+
+    //void OnMove(InputValue value)
+    //{
+    //    if(gameState == GameState.InGame)
+    //    {
+    //        Vector2 val = value.Get<Vector2>();
+    //        axisH = val.x;
+    //    }
+    //}
+
+    //void OnJump(InputValue value)
+    //{
+    //    if (gameState == GameState.InGame)
+    //    {
+    //        goJump = true;
+    //    }
+    //}
 
     void Update()
     {
@@ -73,13 +111,18 @@ public class PlayerController : MonoBehaviour
             0.0f, //距離
             groundLayer);
 
-        if (Input.GetButtonDown("Jump"))
+        //if (Input.GetButtonDown("Jump"))
+        //{
+        //    goJump = true;
+        //}
+
+        if(jumpAction.WasPressedThisFrame())
         {
-            goJump = true;
+            goJump = true; //ジャンプフラグを立てる
         }
 
-        axisH = Input.GetAxisRaw("Horizontal");     //水平方向の入力をチェックする
-
+        //axisH = Input.GetAxisRaw("Horizontal");     //水平方向の入力をチェックする
+        axisH = moveAction.ReadValue<Vector2>().x;
 
         if (axisH > 0.0f)                           // 向きの調整
         {
@@ -214,5 +257,10 @@ public class PlayerController : MonoBehaviour
     void GameStop()
     {
         rbody.linearVelocity = new Vector2(0,0); //速度0にしてプレイヤーの動きを強制停止
+        //Playerマップの無効化とUIマップの有効化
+        PlayerInput input= GetComponent<PlayerInput>(); //PlayerInput取得
+        input.currentActionMap.Disable(); //Player無効化
+        input.SwitchCurrentActionMap("UI"); //アクションマップをUIに変更
+        input.currentActionMap.Enable(); //UIマップ有効化
     }
 }
